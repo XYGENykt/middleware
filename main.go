@@ -26,15 +26,38 @@ func main() {
 
 func Handler(ctx echo.Context) error {
 
-	d := time.Date(2026, time.January, 1, 0, 0, 0, 0, time.UTC)
+	thursdays := getThursdays(2023, 2025)
 
-	dur := time.Until(d)
+	// Выводим результат
+	fmt.Println("Все четверги с 2023 по 2025 год:")
+	for _, thursday := range thursdays {
+		fmt.Printf("%s\n", thursday)
+	}
 
-	s := fmt.Sprintf("Количество дней:%d", int64(dur.Hours())/24)
+	// Можно использовать массив `thursdays` дальше
+	s := fmt.Sprintf("\nВсего четвергов: %d\n", len(thursdays))
 
 	err := ctx.String(http.StatusOK, s)
 	if err != nil {
 		return (err)
 	}
 	return nil
+}
+
+func getThursdays(startYear, endYear int) []string {
+
+	var thursdays []string
+
+	// Устанавливаем начальную и конечную даты
+	start := time.Date(startYear, time.January, 1, 0, 0, 0, 0, time.UTC)
+	end := time.Date(endYear, time.December, 31, 23, 59, 59, 0, time.UTC)
+
+	// Перебираем дни и добавляем четверги в массив
+	for d := start; !d.After(end); d = d.AddDate(0, 0, 1) {
+		if d.Weekday() == time.Thursday {
+			thursdays = append(thursdays, d.Format("2006-01-02"))
+		}
+	}
+
+	return thursdays
 }
